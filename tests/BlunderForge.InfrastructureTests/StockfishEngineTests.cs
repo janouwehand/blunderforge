@@ -209,7 +209,9 @@ public sealed class StockfishEngineTests
     private static string FakeStockfishPath()
     {
         var extension = OperatingSystem.IsWindows() ? ".exe" : string.Empty;
-        var configuration = "Debug";
+        var configuration = new DirectoryInfo(Path.GetFullPath(Path.Combine(
+            AppContext.BaseDirectory,
+            ".."))).Name;
         var path = Path.GetFullPath(Path.Combine(
             AppContext.BaseDirectory,
             "..",
