@@ -1,0 +1,34 @@
+name: blunderforge
+
+services:
+  blunderforge:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: blunderforge:local
+    ports:
+      - "${BLUNDERFORGE_PORT:-8087}:8080"
+    environment:
+      ASPNETCORE_URLS: "http://+:8080"
+      ConnectionStrings__Default: "Data Source=/app/data/blunderforge.db"
+      BlunderForge__DataDirectory: "/app/data"
+      BlunderForge__Stockfish__Path: "/app/stockfish/stockfish"
+      BlunderForge__AiProvider__Provider: "DeepSeek"
+      BlunderForge__AiProvider__BaseUrl: "https://api.deepseek.com"
+      BlunderForge__AiProvider__InteractiveModel: "deepseek-v4-flash"
+      BlunderForge__AiProvider__ReviewModel: "deepseek-v4-pro"
+      BlunderForge__AiProvider__TimeoutSeconds: "30"
+      BlunderForge__AiProvider__MaxRetryCount: "1"
+    volumes:
+      - blunderforge-data:/app/data
+    healthcheck:
+      test: ["CMD", "curl", "--fail", "http://localhost:8080/health"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 20s
+    restart: unless-stopped
+    stop_grace_period: 30s
+
+volumes:
+  blunderforge-data:

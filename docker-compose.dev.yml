@@ -1,0 +1,23 @@
+name: blunderforge-dev
+
+services:
+  blunderforge:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: dev
+    command: dotnet watch --project src/BlunderForge.Web/BlunderForge.Web.csproj run --urls http://0.0.0.0:8080
+    working_dir: /workspace
+    ports:
+      - "8080:8080"
+    environment:
+      ASPNETCORE_ENVIRONMENT: Development
+      ASPNETCORE_URLS: "http://+:8080"
+      BlunderForge__DataDirectory: "/workspace/.data"
+      BlunderForge__Stockfish__Path: "/app/stockfish/stockfish"
+    volumes:
+      - .:/workspace
+      - blunderforge-dev-data:/workspace/.data
+
+volumes:
+  blunderforge-dev-data:

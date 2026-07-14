@@ -1,0 +1,69 @@
+@BlunderForge_HostAddress = http://localhost:8087
+@GameId = 00000000-0000-0000-0000-000000000000
+
+GET {{BlunderForge_HostAddress}}/health
+Accept: application/json
+
+###
+
+GET {{BlunderForge_HostAddress}}/ready
+Accept: application/json
+
+###
+
+POST {{BlunderForge_HostAddress}}/api/games
+Content-Type: application/json
+
+{
+  "playerColorChoice": "Random",
+  "opponentElo": 800
+}
+
+###
+
+GET {{BlunderForge_HostAddress}}/api/games/active
+Accept: application/json
+
+###
+
+POST {{BlunderForge_HostAddress}}/api/games/active/coach
+Content-Type: application/json
+
+{
+  "useAiExplanation": false
+}
+
+###
+
+GET {{BlunderForge_HostAddress}}/api/games?page=1
+Accept: application/json
+
+###
+
+GET {{BlunderForge_HostAddress}}/api/games/{{GameId}}
+Accept: application/json
+
+###
+
+GET {{BlunderForge_HostAddress}}/api/games/{{GameId}}/review
+Accept: application/json
+
+###
+
+POST {{BlunderForge_HostAddress}}/api/games/{{GameId}}/review
+Accept: application/json
+
+###
+
+GET {{BlunderForge_HostAddress}}/api/games/{{GameId}}/pgn
+Accept: application/x-chess-pgn
+
+###
+
+GET {{BlunderForge_HostAddress}}/api/settings/ai-provider
+Accept: application/json
+
+###
+
+POST {{BlunderForge_HostAddress}}/api/settings/ai-provider/test
+Accept: application/json

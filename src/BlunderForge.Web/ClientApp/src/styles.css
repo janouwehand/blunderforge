@@ -1,0 +1,82 @@
+:root { color: #1c241f; background: #f3f0e8; font-family: Inter, ui-sans-serif, system-ui, sans-serif; font-synthesis: none; }
+* { box-sizing: border-box; }
+body { margin: 0; min-width: 320px; }
+button, input, select { font: inherit; }
+button, a { outline-offset: 3px; }
+h1 { font-family: Georgia, serif; font-size: clamp(2.2rem, 6vw, 4.8rem); line-height: .96; margin: 0 0 1rem; font-weight: 500; }
+h2 { font-family: Georgia, serif; font-size: 1.65rem; margin: 0 0 .8rem; }
+h3 { margin-bottom: .4rem; }
+p { line-height: 1.55; }
+.sr-only { clip: rect(0 0 0 0); clip-path: inset(50%); height: 1px; overflow: hidden; position: absolute; white-space: nowrap; width: 1px; }
+.app-shell { min-height: 100vh; }
+.site-header { align-items: center; background: #16251d; color: #fff; display: flex; justify-content: space-between; padding: 14px clamp(18px, 5vw, 70px); }
+.brand { align-items: center; background: transparent; border: 0; color: inherit; cursor: pointer; display: flex; font-family: Georgia, serif; font-size: 1.3rem; gap: 10px; text-decoration: none; }
+.brand-mark { align-items: center; background: #d9a441; border-radius: 50%; color: #16251d; display: inline-flex; font: 700 .72rem Inter, sans-serif; height: 34px; justify-content: center; width: 34px; }
+.site-header nav { display: flex; gap: 6px; }
+.site-header nav a { background: transparent; border: 0; border-radius: 999px; color: #dbe5de; cursor: pointer; padding: 9px 14px; text-decoration: none; }
+.site-header nav a[aria-current="page"] { background: #f3f0e8; color: #16251d; }
+.app-content { margin: 0 auto; max-width: 1320px; padding: clamp(28px, 5vw, 72px) clamp(18px, 5vw, 70px); }
+.eyebrow { color: #8a5b13; font-size: .76rem; font-weight: 800; letter-spacing: .13em; margin: 0 0 10px; text-transform: uppercase; }
+.muted { color: #59645e; }
+.play-landing { align-items: center; display: grid; gap: clamp(32px, 7vw, 100px); grid-template-columns: minmax(0, 1fr) minmax(340px, 500px); min-height: calc(100vh - 190px); }
+.hero-copy > p:last-child { color: #546059; font-size: 1.15rem; max-width: 570px; }
+.setup-card, .panel, .settings-panel, .empty-state { background: #fffdf8; border: 1px solid #d8d2c5; border-radius: 18px; box-shadow: 0 18px 50px rgba(32, 42, 35, .09); padding: clamp(24px, 4vw, 40px); }
+.game-setup { display: flex; flex-direction: column; gap: 16px; }
+.game-setup fieldset { border: 0; margin: 0; padding: 0; }
+.game-setup legend, .elo-heading > label { font-weight: 750; margin-bottom: 8px; }
+.radio-group, .button-row, .game-actions, .coach-actions { display: flex; flex-wrap: wrap; gap: 10px; }
+.radio-label { align-items: center; border: 1px solid #c9c5ba; border-radius: 999px; cursor: pointer; display: flex; gap: 7px; padding: 9px 15px; }
+.radio-label:has(input:checked) { background: #e3eee6; border-color: #315f43; font-weight: 700; }
+.elo-heading { align-items: center; display: flex; justify-content: space-between; }
+.elo-heading details { position: relative; }
+.elo-heading summary { align-items: center; border: 1px solid #76827a; border-radius: 50%; cursor: pointer; display: flex; font-weight: 700; height: 26px; justify-content: center; list-style: none; width: 26px; }
+.elo-heading details p { background: #16251d; border-radius: 10px; color: white; font-size: .85rem; padding: 12px; position: absolute; right: 0; width: min(320px, 75vw); z-index: 3; }
+input[type="number"], input[type="url"], input:not([type]), select { border: 1px solid #aaa69b; border-radius: 8px; padding: 10px 12px; width: 100%; }
+input[type="range"] { accent-color: #315f43; width: 100%; }
+.ai-availability { background: #eef3ed; border-left: 3px solid #567361; font-size: .87rem; margin: 0; padding: 10px 12px; }
+.btn-primary, .btn-secondary, .btn-danger, .game-actions button, .replay-controls button, .pagination button { border-radius: 9px; cursor: pointer; padding: 10px 16px; text-decoration: none; }
+.btn-primary { background: #315f43; border: 1px solid #315f43; color: white; font-weight: 700; }
+.btn-secondary, .game-actions button, .replay-controls button, .pagination button { background: #fff; border: 1px solid #a9aea9; color: #1c241f; }
+.btn-danger { background: #fff8f5; border: 1px solid #a33b2f; color: #8b271c; }
+button:disabled { cursor: not-allowed; opacity: .5; }
+.text-button, .icon-button { background: transparent; border: 0; color: #315f43; cursor: pointer; font-weight: 700; padding: 6px; }
+.error-banner { background: #fff2ee; border: 1px solid #b84a3b; border-radius: 10px; margin-bottom: 20px; padding: 12px 16px; }
+.error-banner p { margin: 4px 0; }
+.game-heading, .detail-heading { align-items: end; display: flex; justify-content: space-between; margin-bottom: 18px; }
+.game-heading h1, .detail-heading h1, #games-title { font-size: clamp(2.4rem, 5vw, 4rem); }
+.game-heading p, .detail-heading p { margin: 0; }
+.game-status { background: #e8eee9; border-radius: 10px; margin-bottom: 18px; padding: 12px 16px; }
+.game-status p { margin: 0; }
+.game-status-turn, .game-status-result { font-weight: 800; }
+.game-grid, .replay-layout { align-items: start; display: grid; gap: clamp(18px, 3vw, 34px); grid-template-columns: minmax(480px, 760px) minmax(230px, 320px); justify-content: center; }
+.chessboard-container { max-width: 760px; width: 100%; }
+.chessboard-wrapper { position: relative; width: 100%; }
+.chessboard-overlay { animation: pulse 1.2s infinite; background: rgba(255,255,255,.25); inset: 0; pointer-events: none; position: absolute; }
+@keyframes pulse { 50% { background: rgba(255,255,255,.5); } }
+.game-sidebar { display: flex; flex-direction: column; gap: 16px; }
+.move-list, .coach-panel { background: #fffdf8; border: 1px solid #d8d2c5; border-radius: 12px; padding: 14px 16px; }
+.move-list { max-height: 440px; overflow: auto; }
+.move-list-title { font-family: inherit; font-size: .9rem; margin: 0 0 8px; }
+.move-list-entries { list-style: none; margin: 0; padding: 0; }
+.move-pair { display: grid; gap: 8px; grid-template-columns: 30px 1fr 1fr; padding: 3px 0; }
+.move-number { color: #778079; text-align: right; }
+.move-san { font-family: ui-monospace, monospace; padding: 2px; }
+.move-san[aria-current="step"] { background: #f0cc83; border-radius: 3px; font-weight: 700; }
+.coach-panel-header { align-items: center; display: flex; justify-content: space-between; }
+.coach-panel h2 { font-family: inherit; font-size: 1rem; margin: 0; }
+.checkbox-label { align-items: center; display: flex; font-size: .88rem; gap: 6px; }
+.coach-result { border-top: 1px solid #dedad0; margin-top: 12px; }
+.game-actions { border-top: 1px solid #d8d2c5; margin-top: 24px; padding-top: 20px; }
+.panel { margin: 28px 0; box-shadow: none; }
+.review-summary { display: flex; gap: 35px; }
+.review-summary div { display: grid; gap: 3px; }
+.review-summary dt { color: #657068; font-size: .8rem; text-transform: uppercase; }.review-summary dd { font-weight: 800; margin: 0; }
+.history-list { display: grid; gap: 10px; list-style: none; margin: 25px 0; padding: 0; }
+.history-list button { align-items: center; background: #fffdf8; border: 1px solid #d8d2c5; border-radius: 12px; cursor: pointer; display: flex; justify-content: space-between; padding: 18px 20px; text-align: left; width: 100%; }
+.history-list span { display: flex; flex-direction: column; gap: 3px; }.history-list small { color: #69736d; }
+.pagination, .replay-controls { align-items: center; display: flex; gap: 12px; justify-content: center; margin-top: 14px; }
+.settings-panel { max-width: 720px; }.settings-panel form { display: grid; gap: 16px; }.settings-panel label { display: grid; font-weight: 700; gap: 6px; }
+.dialog-backdrop { align-items: center; background: rgba(14,24,18,.7); display: flex; inset: 0; justify-content: center; padding: 20px; position: fixed; z-index: 20; }
+.confirm-dialog { background: #fff; border-radius: 14px; max-width: 460px; padding: 28px; width: 100%; }
+@media (max-width: 980px) { .game-grid, .replay-layout { grid-template-columns: minmax(0, 680px); }.game-sidebar { display: grid; grid-template-columns: 1fr 1fr; }.play-landing { grid-template-columns: 1fr; min-height: auto; }.hero-copy { max-width: 700px; } }
+@media (max-width: 680px) { .site-header { align-items: flex-start; flex-direction: column; gap: 12px; }.site-header nav { overflow-x: auto; width: 100%; }.app-content { padding-top: 30px; }.game-sidebar { display: flex; }.game-heading, .detail-heading { align-items: flex-start; flex-direction: column; gap: 12px; }.game-grid, .replay-layout { display: block; }.game-sidebar, .replay-layout aside { margin-top: 16px; }.history-list button { align-items: flex-start; flex-direction: column; gap: 8px; } }
