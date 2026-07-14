@@ -29,7 +29,7 @@ RUN set -eux; \
     git -C /src/stockfish archive HEAD | tar -x -C /out/source; \
     printf '%s\n' "${STOCKFISH_COMMIT}" > /out/SOURCE_REVISION
 
-FROM mcr.microsoft.com/dotnet/sdk:10.0 AS build
+FROM mcr.microsoft.com/dotnet/sdk:10.0 AS dotnet-source
 WORKDIR /src
 COPY BlunderForge.sln ./
 COPY Directory.Build.props ./
@@ -44,14 +44,20 @@ COPY tests/BlunderForge.InfrastructureTests/BlunderForge.InfrastructureTests.csp
 COPY tests/BlunderForge.FakeStockfish/BlunderForge.FakeStockfish.csproj tests/BlunderForge.FakeStockfish/
 RUN dotnet restore BlunderForge.sln
 COPY . .
-COPY --from=client-build /src/src/BlunderForge.Web/wwwroot ./src/BlunderForge.Web/wwwroot
-RUN dotnet publish src/BlunderForge.Web/BlunderForge.Web.csproj --configuration Release --output /app/publish --no-restore
 
-FROM build AS stockfish-integration-tests
+FROM dotnet-source AS stockfish-integration-tests
 COPY --from=stockfish-build /out/stockfish /app/stockfish/stockfish
 ENV BLUNDERFORGE_TEST_STOCKFISH_PATH=/app/stockfish/stockfish \
     BlunderForge__Stockfish__Path=/app/stockfish/stockfish
-RUN dotnet test BlunderForge.sln --no-restore --filter Stockfish
+RUN dotnet test BlunderForge.sln \
+      --configuration Release \
+      --no-restore \
+      --filter Stockfish \
+    && touch /tmp/stockfish-tests-passed
+
+FROM dotnet-source AS publish
+COPY --from=client-build /src/src/BlunderForge.Web/wwwroot ./src/BlunderForge.Web/wwwroot
+RUN dotnet publish src/BlunderForge.Web/BlunderForge.Web.csproj --configuration Release --output /app/publish --no-restore
 
 FROM mcr.microsoft.com/dotnet/sdk:10.0 AS dev
 RUN apt-get update \
@@ -62,7 +68,7 @@ COPY --from=stockfish-build /out/stockfish /app/stockfish/stockfish
 ENV BlunderForge__Stockfish__Path=/app/stockfish/stockfish
 WORKDIR /workspace
 
-FROM mcr.microsoft.com/dotnet/aspnet:10.0 AS final
+FROM mcr.microsoft.com/dotnet/aspnet:10.0 AS runtime
 RUN apt-get update \
     && apt-get install --no-install-recommends --yes curl libstdc++6 \
     && rm -rf /var/lib/apt/lists/*
@@ -73,7 +79,7 @@ RUN groupadd --system blunderforge \
     && chown -R blunderforge:blunderforge /app
 
 WORKDIR /app
-COPY --from=build --chown=blunderforge:blunderforge /app/publish .
+COPY --from=publish --chown=blunderforge:blunderforge /app/publish .
 COPY --from=stockfish-build --chown=blunderforge:blunderforge /out/stockfish /app/stockfish/stockfish
 COPY --from=stockfish-build /out/source /usr/share/stockfish/source
 COPY --from=stockfish-build /out/SOURCE_REVISION /usr/share/stockfish/SOURCE_REVISION
@@ -97,3 +103,8 @@ HEALTHCHECK --interval=30s --timeout=5s --start-period=20s --retries=3 \
   CMD curl --fail http://localhost:8080/health || exit 1
 
 ENTRYPOINT ["dotnet", "BlunderForge.Web.dll"]
+
+FROM runtime AS ci
+COPY --from=stockfish-integration-tests /tmp/stockfish-tests-passed /tmp/stockfish-tests-passed
+
+FROM runtime AS final
