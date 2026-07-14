@@ -188,3 +188,7 @@ Its exact revision and redistribution details are documented in
 [`THIRD_PARTY_NOTICES.md`](THIRD_PARTY_NOTICES.md). The image also carries the
 Stockfish license and complete corresponding source under
 `/usr/share/stockfish/`.
+
+## Impression
+
+<img width="1152" height="1238" alt="image" src="https://github.com/user-attachments/assets/ce4cd63a-a8a4-4c8e-93a1-d8f52d5f493e" />
