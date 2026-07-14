@@ -1,4 +1,4 @@
-FROM node:24-bookworm-slim AS client-build
+FROM node:26-bookworm-slim AS client-build
 WORKDIR /src/src/BlunderForge.Web/ClientApp
 COPY src/BlunderForge.Web/ClientApp/package*.json ./
 RUN npm ci
