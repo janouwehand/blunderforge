@@ -1,30 +1,116 @@
-# BlunderForge
+# BlunderForge ♟️
 
-BlunderForge is a local, single-user guided chess application. Play one standard-chess game at a time against Stockfish, choose an approximate opponent Elo from 200 through 3000, ask Stockfish for objective move help, and optionally add a concise AI explanation.
+> Your local chess sparring partner. Tough when you want it, helpful when you need it.
 
-Stockfish and deterministic chess logic are always the source of chess truth. AI is optional: games, Stockfish coaching, history, and PGN export continue to work without a provider. Reviews are requested only with explicit opt-in and an available provider secret; a failed requested review falls back to deterministic content. BlunderForge does not maintain a learning profile, estimate a user rating, or adapt across games.
+[![CI](https://github.com/janouwehand/blunderforge/actions/workflows/ci.yml/badge.svg)](https://github.com/janouwehand/blunderforge/actions/workflows/ci.yml)
+[![Release](https://img.shields.io/github/v/release/janouwehand/blunderforge)](https://github.com/janouwehand/blunderforge/releases/latest)
 
-## Product behavior
+BlunderForge is a private, single-player chess app that runs on your own machine.
+Play against Stockfish, ask for a nudge when you are stuck, revisit finished
+games, and export them as PGN.
 
-- New games default to Random color and opponent Elo 800. White, Black, and any whole Elo from 200 through 3000 are supported.
-- Elo 200–1319 uses a calibrated randomized selection from a broad Stockfish candidate set. Elo 1320–3000 uses Stockfish's native `UCI_LimitStrength` and `UCI_Elo` settings. Both regimes are approximate practical strengths.
-- Every accepted move is persisted immediately. An active game, including a pending opponent turn, can resume after navigation, browser restart, or container restart.
-- `Coach me` is available on the player's turn. It always returns a Stockfish move, text alternative, highlights, and an arrow. When AI is configured, `Use AI explanation and game review` controls both coaching text and automatic end-of-game review requests; clearing it makes neither AI call.
-- The latest player turn can be taken back. Active and historical games can be permanently deleted after confirmation.
-- Completed and resigned games appear in paginated history, support move replay, and can be exported as PGN. If no review was requested at game end, it can be generated once later through an explicit action when AI and its secret are available.
-- Primary screens have direct routes: `/play`, `/games`, `/games/{gameId}`, and `/ai-coach`, including browser back/forward support.
+No account. No rating grind. No mysterious opponent behind the curtain.
 
-## Local development
+## Pick a fight
 
-The selected toolchains are .NET 10 and Node.js 24. Restore, build, and test the backend:
+- 🎯 Choose an approximate opponent Elo from **200 to 3000**.
+- ⚪ Play White, Black, or let BlunderForge surprise you.
+- 💡 Press **Coach me** for a Stockfish suggestion, highlights, and an arrow.
+- ↩️ Take back your latest turn when curiosity wins.
+- 📚 Resume unfinished games and replay completed ones.
+- 📄 Export any finished game as PGN.
+- 🤖 Add optional AI explanations and reviews with DeepSeek or an
+  OpenAI-compatible provider.
+
+BlunderForge plays one standard-chess game at a time. Every accepted move is
+saved immediately, so closing the browser or restarting the container does not
+cost you the position.
+
+## Start playing
+
+The ready-to-run image contains the web app, React frontend, and Stockfish 17.1.
+It supports Linux `amd64` and `arm64`.
+
+```powershell
+docker volume create blunderforge-data
+
+docker run -d `
+  --name blunderforge `
+  --restart unless-stopped `
+  -p 8085:8080 `
+  -v blunderforge-data:/app/data `
+  ghcr.io/janouwehand/blunderforge:0.1
+```
+
+Open <http://localhost:8085> and make your first move.
+
+The named volume keeps your games and settings safe when the container is
+replaced. AI is not required. To add a DeepSeek or OpenAI-compatible key, follow
+the copy-ready instructions in the
+[latest release](https://github.com/janouwehand/blunderforge/releases/latest#configure-an-ai-api-key-optional).
+
+## Chess truth comes first
+
+Stockfish and deterministic chess rules decide what is legal and what is good.
+AI may explain a move in friendlier language, but it never replaces the engine.
+If an AI request fails, BlunderForge falls back to deterministic content.
+
+Lower Elo levels use calibrated randomness across a broad set of Stockfish
+candidates. From Elo 1320 upward, BlunderForge uses Stockfish's native
+`UCI_LimitStrength` and `UCI_Elo` options. These are practical approximations,
+not official ratings.
+
+BlunderForge deliberately does **not** build a learning profile, estimate your
+rating, or adapt across games.
+
+## Optional AI coach
+
+The app works fully without a provider key. When AI is enabled, you can request:
+
+- a concise explanation alongside the Stockfish coaching move;
+- an end-of-game review;
+- a review later from game history if you skipped it initially.
+
+The AI Coach screen stores only non-secret settings such as provider, URL,
+models, timeout, and retries. API keys come from container environment variables
+or secret files and are never shown in the UI.
+
+See the
+[v0.1.0 release guide](https://github.com/janouwehand/blunderforge/releases/tag/v0.1.0#configure-an-ai-api-key-optional)
+for complete DeepSeek and OpenAI-compatible examples.
+
+## Your data stays yours
+
+BlunderForge stores one SQLite database at
+`/app/data/blunderforge.db`. In the command above, that directory is backed by
+the `blunderforge-data` Docker volume.
+
+```powershell
+docker inspect --format='{{.State.Health.Status}}' blunderforge
+docker logs blunderforge
+```
+
+Stopping or removing the container leaves the volume intact. Do not delete the
+volume unless you intentionally want to delete every game and setting.
+
+## Build and tinker
+
+You need **.NET 10** and **Node.js 24**.
+
+<details>
+<summary><strong>Backend</strong></summary>
 
 ```bash
 dotnet restore BlunderForge.sln
 dotnet build BlunderForge.sln --no-restore
 dotnet test BlunderForge.sln --no-build
+dotnet run --project src/BlunderForge.Web
 ```
 
-Install and verify the frontend:
+</details>
+
+<details>
+<summary><strong>Frontend</strong></summary>
 
 ```bash
 cd src/BlunderForge.Web/ClientApp
@@ -35,128 +121,70 @@ npm run test
 npm run build
 ```
 
-Run the backend locally after setting a writable data directory and a valid Stockfish path:
+Use `npm run dev` for the Vite development server.
 
-```bash
-dotnet run --project src/BlunderForge.Web
-```
+</details>
 
-For frontend-only development, run `npm run dev` in `src/BlunderForge.Web/ClientApp`. The explicit container hot-reload environment is started with:
+<details>
+<summary><strong>Container development</strong></summary>
 
 ```bash
 docker compose -f docker-compose.dev.yml up --build
 ```
 
-## Configuration
+Useful image checks:
 
-Non-secret settings use ASP.NET Core configuration keys. The production defaults are:
-
-```env
-ConnectionStrings__Default=Data Source=/app/data/blunderforge.db
-BlunderForge__DataDirectory=/app/data
-BlunderForge__Stockfish__Path=/app/stockfish/stockfish
-BlunderForge__AiProvider__Provider=DeepSeek
-BlunderForge__AiProvider__BaseUrl=https://api.deepseek.com
-BlunderForge__AiProvider__InteractiveModel=deepseek-v4-flash
-BlunderForge__AiProvider__ReviewModel=deepseek-v4-pro
-BlunderForge__AiProvider__TimeoutSeconds=30
-BlunderForge__AiProvider__MaxRetryCount=1
+```powershell
+./scripts/docker-stockfish-smoke.ps1
+docker build --target stockfish-integration-tests .
 ```
 
-The AI Coach screen can store non-secret provider, URL, model, timeout, and retry settings in SQLite. It never displays or accepts an API key. Supported providers are `DeepSeek` and `OpenAICompatible`; interactive and review models are configured separately.
+</details>
 
-Secrets are read only from environment variables or files. `_FILE` takes precedence when both forms are present:
+Contributions are welcome. Start with [CONTRIBUTING.md](CONTRIBUTING.md).
 
-```env
-BLUNDERFORGE_DEEPSEEK_API_KEY=obviously-fake-example
-BLUNDERFORGE_DEEPSEEK_API_KEY_FILE=/run/secrets/deepseek_api_key
-BLUNDERFORGE_OPENAI_COMPATIBLE_API_KEY=obviously-fake-example
-BLUNDERFORGE_OPENAI_COMPATIBLE_API_KEY_FILE=/run/secrets/openai_compatible_api_key
-```
+## Useful doors
 
-For Docker secrets, add a local Compose override that mounts the secret and sets the matching `_FILE` variable. Do not commit the override or secret file. For example:
+| Route | What lives there |
+| --- | --- |
+| `/play` | Your active game |
+| `/games` | History, replay, reviews, and PGN export |
+| `/ai-coach` | Non-secret AI provider settings |
+| `/health` | Application liveness |
+| `/ready` | Database and Stockfish readiness |
+| `/health/ai` | Optional AI provider status |
 
-```yaml
-services:
-  blunderforge:
-    secrets:
-      - deepseek_api_key
-    environment:
-      BLUNDERFORGE_DEEPSEEK_API_KEY_FILE: /run/secrets/deepseek_api_key
+Maintained API examples live in
+[`BlunderForge.Web.http`](src/BlunderForge.Web/BlunderForge.Web.http).
 
-secrets:
-  deepseek_api_key:
-    file: ./secrets/deepseek_api_key
-```
+## Built to ship
 
-Normal page loads check only settings and local secret availability. The explicit `Test connection` action performs the external provider request. No paid AI call is required by the automated test suites.
+Every push and pull request runs backend tests, frontend checks, dependency
+audits, real-Stockfish integration tests, and a production container build.
 
-## API and health endpoints
+Semantic version tags publish multi-architecture images to
+[`ghcr.io/janouwehand/blunderforge`](https://github.com/users/janouwehand/packages/container/package/blunderforge)
+with an SBOM and GitHub build-provenance attestations.
 
-Maintained request examples are in `src/BlunderForge.Web/BlunderForge.Web.http`.
+See [Releases](https://github.com/janouwehand/blunderforge/releases) for
+version-specific setup notes and immutable image digests.
 
-- `/api/games` and `/api/games/active/*`: start/resume, legal moves, move submission, pending opponent turn, coaching, takeback, resignation, and hard deletion.
-- `/api/games/{gameId}`, `/review`, and `/pgn`: historical detail, explicit one-time review generation/retrieval, and PGN export.
-- `/api/settings/ai-provider`: read or update non-secret settings; `/test` explicitly tests connectivity.
-- `/health` and `/health/live`: application liveness.
-- `/ready`: database migration and Stockfish readiness.
-- `/health/ai`: optional AI provider status; AI unavailability does not fail general readiness.
+## Coming from ChessLearner?
 
-API write bodies are limited to 64 KiB. Errors contain a safe correlation ID, and provider text is rendered as plain text rather than HTML.
+BlunderForge replaces the old adaptive-trainer database schema. It cannot open
+or migrate a ChessLearner database.
 
-## Production container
-
-Build and start the one-container production stack:
-
-```bash
-docker compose config
-docker compose build
-docker compose up -d
-```
-
-Compose publishes BlunderForge at `http://localhost:8087` by default; set `BLUNDERFORGE_PORT` to choose another host port. The image contains the ASP.NET Core application, built React assets, and Stockfish 17.1. It runs as the non-root `blunderforge` user and stores the only persistent user database at `/app/data/blunderforge.db` in the `blunderforge-data` volume. The image contains no seeded database or secret. Stop without deleting data using `docker compose down`.
-
-The Dockerfile supports Linux `amd64` and `arm64` Stockfish builds. Run `./scripts/docker-stockfish-smoke.ps1` for a direct UCI image check or `docker build --target stockfish-integration-tests .` for the real-engine integration target.
-
-## Continuous integration and releases
-
-Every pull request and push to `main` runs warning-free .NET restore/build/tests,
-frontend lint/type-check/tests/build, NuGet and npm vulnerability audits, the
-real-Stockfish container integration target, and a production-image build.
-Dependabot checks NuGet, npm, Docker base images, and GitHub Actions weekly.
-
-Pushing a semantic version tag such as `v1.0.0` publishes signed-provenance,
-SBOM-enabled Linux `amd64` and `arm64` images to
-`ghcr.io/<owner>/<repository>`. Version tags, a major/minor tag, `latest`, and an
-immutable commit-SHA tag are generated automatically. The first published GHCR
-package should be checked once in GitHub's package settings to confirm that its
-visibility is Public and that it inherits access from this repository.
+Back up anything you want to keep, stop the old application, and start
+BlunderForge with a new database or Docker volume. Never point BlunderForge at
+the old SQLite file. Startup will not silently delete or recreate an existing
+database.
 
 ## License
 
-BlunderForge's own source code is available under the [MIT license](LICENSE).
+BlunderForge is available under the [MIT license](LICENSE).
+
 The container includes Stockfish 17.1 as a separate GPLv3-or-later executable.
-Its exact revision, corresponding-source link, and redistribution details are in
-[THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md). The image itself includes both
-the Stockfish license and the complete corresponding source under
+Its exact revision and redistribution details are documented in
+[`THIRD_PARTY_NOTICES.md`](THIRD_PARTY_NOTICES.md). The image also carries the
+Stockfish license and complete corresponding source under
 `/usr/share/stockfish/`.
-
-## One-time destructive upgrade from ChessLearner
-
-The BlunderForge redesign intentionally replaces the old adaptive-trainer schema with one new initial migration. It does not migrate an old ChessLearner database.
-
-1. Stop the old application: `docker compose down`.
-2. If the old app used a bind-mounted SQLite file, back it up if needed and then explicitly remove that old database file. Never point BlunderForge at it.
-3. If the old app used the repository's old Docker volume and no data must be retained, identify it with `docker volume ls`, verify its exact name, and remove that specific old volume with `docker volume rm <verified-old-volume-name>`. Do not use a broad prune command.
-4. Build the final image with `docker compose build`.
-5. Start BlunderForge with `docker compose up -d`. A new empty `blunderforge-data` volume is created and the single initial migration runs automatically.
-6. Verify `http://localhost:8087/health` and `http://localhost:8087/ready`, start a game, restart the service with `docker compose restart blunderforge`, and confirm that the active game resumes.
-
-This reset is required once for the redesign. Startup never automatically deletes or recreates an existing database.
-
-## Release verification
-
-Before publishing, run the backend, frontend, dependency, and Docker commands in
-`plans/release-hardening.md`. Browser end-to-end tests are intentionally outside
-the scope of this small local application; component and API integration tests
-cover the supported flows.
